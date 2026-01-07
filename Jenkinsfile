@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        maven 'maven' 
+        maven 'maven'
     }
 
     environment {
@@ -14,32 +14,32 @@ pipeline {
         stage('1. Checkout') {
             steps {
                 checkout scm
-                echo 'Kodlar Github\'dan çekildi (5 puan)'
+                echo 'Kodlar Github\'dan çekildi'
             }
         }
 
         stage('2. Build') {
             steps {
                 bat 'mvn clean package -DskipTests'
-                echo 'Kodlar build edildi (5 puan)'
+                echo 'Kodlar build edildi'
             }
         }
 
         stage('3. Unit Tests') {
             steps {
                 bat 'mvn test'
-                
+
                 junit 'target/surefire-reports/*.xml'
-                echo 'Birim Testleri çalıştırıldı ve raporlandı (15 puan)'
+                echo 'Birim Testleri çalıştırıldı ve raporlandı '
             }
         }
 
         stage('4. Integration Tests') {
             steps {
                 bat 'mvn verify -DskipUnitTests'
-                
+
                 junit 'target/failsafe-reports/*.xml'
-                echo 'Entegrasyon testleri çalıştırıldı ve raporlandı (15 puan)'
+                echo 'Entegrasyon testleri çalıştırıldı ve raporlandı'
             }
         }
 
@@ -57,19 +57,19 @@ pipeline {
                     echo 'Docker build ve run işlemi...'
                     bat "docker build -t ${IMAGE_NAME} ."
                     bat "docker run -d -p 8090:8080 --name ${CONTAINER_NAME} ${IMAGE_NAME}"
-                    
+
                     echo 'Sistemin ayağa kalkması bekleniyor (20sn)...'
                     sleep 20
                 }
-                echo 'Sistem docker container\'lar üzerinde çalıştırıldı (5 puan)'
+                echo 'Sistem docker container\'lar üzerinde çalıştırıldı'
             }
         }
 
         stage('6. E2E Tests (Selenium)') {
             steps {
                 bat 'mvn test -Dtest=SeleniumSystemTest'
-                
-                echo 'Çalışır durumdaki sistem üzerinden test senaryoları çalıştırıldı (55+ puan)'
+                junit 'target/surefire-reports/TEST-*.xml'
+                echo 'Çalışır durumdaki sistem üzerinden test senaryoları çalıştırıldı'
             }
         }
     }
@@ -77,7 +77,7 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: 'target/**/*.jar', fingerprint: true
-            
+
             script {
                 try {
                     bat "docker stop ${CONTAINER_NAME}"
