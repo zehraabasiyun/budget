@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: butce-app
+    ports:
+      - "8086:8086"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/butce_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    networks:
+      - butce-network
+    restart: always
+
+  db:
+    image: postgres:15-alpine
+    container_name: butce-db
+    environment:
+      - POSTGRES_DB=butce_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - butce-network
+    restart: always
+
+networks:
+  butce-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

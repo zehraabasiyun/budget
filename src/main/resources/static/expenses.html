@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bütçe Detayı - Bütçe Takip Sistemi</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bütçe Takip Sistemi</h1>
+            <div class="user-info">
+                <button onclick="goToBudgets()" class="btn btn-secondary">Bütçelere Dön</button>
+                <button onclick="logout()" class="btn btn-secondary">Çıkış Yap</button>
+            </div>
+        </header>
+
+        <div class="content">
+            <div id="budgetInfo" class="budget-info">
+                <!-- Bütçe bilgileri buraya yüklenecek -->
+            </div>
+
+            <div class="section-header">
+                <h2>Harcamalar</h2>
+                <button onclick="showAddExpenseModal()" class="btn btn-primary">Harcama Ekle</button>
+            </div>
+            <div id="expensesList" class="items-list">
+                <!-- Harcamalar buraya yüklenecek -->
+            </div>
+
+            <div class="section-header">
+                <h2>Gelirler</h2>
+                <button onclick="showAddIncomeModal()" class="btn btn-primary">Gelir Ekle</button>
+            </div>
+            <div id="incomesList" class="items-list">
+                <!-- Gelirler buraya yüklenecek -->
+            </div>
+
+            <div class="section-header">
+                <h2>Plan Defteri</h2>
+                <button onclick="showAddPlanModal()" class="btn btn-primary">Plan Ekle</button>
+            </div>
+            <div id="plansList" class="items-list">
+                <!-- Planlar buraya yüklenecek -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Expense Modal -->
+    <div id="addExpenseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddExpenseModal()">&times;</span>
+            <h2>Harcama Ekle</h2>
+            <form id="addExpenseForm">
+                <div class="form-group">
+                    <label for="expenseAmount">Tutar:</label>
+                    <input type="number" id="expenseAmount" name="amount" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="expenseDescription">Açıklama:</label>
+                    <textarea id="expenseDescription" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="expenseDate">Tarih:</label>
+                    <input type="date" id="expenseDate" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="expenseCategory">Kategori:</label>
+                    <select id="expenseCategory" name="categoryId" required>
+                        <option value="">Kategori Seçin</option>
+                    </select>
+                </div>
+                <div id="errorMessage" class="error-message"></div>
+                <button type="submit" class="btn btn-primary">Ekle</button>
+                <button type="button" onclick="closeAddExpenseModal()" class="btn btn-secondary">İptal</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Income Modal -->
+    <div id="addIncomeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddIncomeModal()">&times;</span>
+            <h2>Gelir Ekle</h2>
+            <form id="addIncomeForm">
+                <div class="form-group">
+                    <label for="incomeAmount">Tutar:</label>
+                    <input type="number" id="incomeAmount" name="amount" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="incomeDescription">Açıklama:</label>
+                    <textarea id="incomeDescription" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="incomeDate">Tarih:</label>
+                    <input type="date" id="incomeDate" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="incomeCategory">Kategori:</label>
+                    <select id="incomeCategory" name="categoryId" required>
+                        <option value="">Kategori Seçin</option>
+                    </select>
+                </div>
+                <div id="errorMessageIncome" class="error-message"></div>
+                <button type="submit" class="btn btn-primary">Ekle</button>
+                <button type="button" onclick="closeAddIncomeModal()" class="btn btn-secondary">İptal</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Plan Modal -->
+    <div id="addPlanModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddPlanModal()">&times;</span>
+            <h2>Plan Ekle</h2>
+            <form id="addPlanForm">
+                <div class="form-group">
+                    <label for="planDescription">Açıklama:</label>
+                    <textarea id="planDescription" name="description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="planAmount">Planlanan Tutar:</label>
+                    <input type="number" id="planAmount" name="plannedAmount" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="planDate">Plan Tarihi:</label>
+                    <input type="date" id="planDate" name="planDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="planCategory">Kategori:</label>
+                    <select id="planCategory" name="categoryId" required>
+                        <option value="">Kategori Seçin</option>
+                    </select>
+                </div>
+                <div id="errorMessagePlan" class="error-message"></div>
+                <button type="submit" class="btn btn-primary">Ekle</button>
+                <button type="button" onclick="closeAddPlanModal()" class="btn btn-secondary">İptal</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/expenses.js"></script>
+</body>
+</html>
+

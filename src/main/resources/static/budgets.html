@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bütçelerim - Bütçe Takip Sistemi</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bütçe Takip Sistemi</h1>
+            <div class="user-info">
+                <span id="userEmail"></span>
+                <button onclick="logout()" class="btn btn-secondary">Çıkış Yap</button>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="section-header">
+                <h2>Bütçelerim</h2>
+                <button onclick="showCreateBudgetModal()" class="btn btn-primary">Yeni Bütçe Oluştur</button>
+            </div>
+
+            <div id="budgetsList" class="budgets-grid">
+                <!-- Bütçeler buraya yüklenecek -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Budget Modal -->
+    <div id="createBudgetModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCreateBudgetModal()">&times;</span>
+            <h2>Yeni Bütçe Oluştur</h2>
+            <form id="createBudgetForm">
+                <div class="form-group">
+                    <label for="budgetName">Bütçe Adı:</label>
+                    <input type="text" id="budgetName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="startDate">Başlangıç Tarihi:</label>
+                    <input type="date" id="startDate" name="startDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">Bitiş Tarihi:</label>
+                    <input type="date" id="endDate" name="endDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="totalBudget">Toplam Bütçe:</label>
+                    <input type="number" id="totalBudget" name="totalBudget" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="monthlyLimit">Aylık Limit:</label>
+                    <input type="number" id="monthlyLimit" name="monthlyLimit" step="0.01" min="0" required>
+                </div>
+                <div id="errorMessage" class="error-message"></div>
+                <button type="submit" class="btn btn-primary">Oluştur</button>
+                <button type="button" onclick="closeCreateBudgetModal()" class="btn btn-secondary">İptal</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/budgets.js"></script>
+</body>
+</html>
+
