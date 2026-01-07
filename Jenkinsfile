@@ -2,66 +2,73 @@ pipeline {
     agent any
 
     tools {
-        // Jenkins'te tanımlı Maven tool adı 'maven' olmalı veya environment'tan gelmeli
         maven 'maven' 
     }
 
+    environment {
+        IMAGE_NAME = "butce-app-image"
+        CONTAINER_NAME = "butce-app-container"
+    }
+
     stages {
-        stage('Checkout') {
+        stage('1. Checkout') {
             steps {
-                // Kod github'dan çekiliyor (Sanal olarak, Jenkins job ayarlarında repo tanımlı varsayılır)
                 checkout scm
                 echo 'Kodlar Github\'dan çekildi (5 puan)'
             }
         }
 
-        stage('Build') {
+        stage('2. Build') {
             steps {
-                // Kodları derle ama testleri çalıştırma
-                sh 'mvn clean package -DskipTests'
+                bat 'mvn clean package -DskipTests'
                 echo 'Kodlar build edildi (5 puan)'
             }
         }
 
-        stage('Unit Tests') {
+        stage('3. Unit Tests') {
             steps {
-                // Sadece Unit testleri çalıştır (Birim testler genellikle SpringBootTest olmayanlardır ama burada hepsi karışık olabilir)
-                // Hızlı olması için sadece belirli paketleri veya normal 'mvn test' çalıştırabiliriz.
-                // İstenen: Birim testleri çalıştır ve raporla.
-                sh 'mvn test -Dtest=*ServiceTest'
-                // JUnit raporlarını arşivle
+                bat 'mvn test'
+                
                 junit 'target/surefire-reports/*.xml'
                 echo 'Birim Testleri çalıştırıldı ve raporlandı (15 puan)'
             }
         }
 
-        stage('Integration Tests') {
+        stage('4. Integration Tests') {
             steps {
-                // Entegrasyon testleri (Controller testleri vb.)
-                sh 'mvn test -Dtest=*ControllerTest'
-                junit 'target/surefire-reports/*.xml'
+                bat 'mvn verify -DskipUnitTests'
+                
+                junit 'target/failsafe-reports/*.xml'
                 echo 'Entegrasyon testleri çalıştırıldı ve raporlandı (15 puan)'
             }
         }
 
-        stage('Docker System Run') {
+        stage('5. Docker System Run') {
             steps {
-                // Docker container'ları ayağa kaldır
-                sh 'docker-compose down'
-                sh 'docker-compose up -d --build'
-                
-                // Sistemin ayağa kalkması için biraz bekle
-                sleep 20
+                script {
+                    echo 'Docker temizliği yapılıyor...'
+                    try {
+                        bat "docker stop ${CONTAINER_NAME}"
+                        bat "docker rm ${CONTAINER_NAME}"
+                    } catch (Exception e) {
+                        echo 'Temizlenecek eski container bulunamadı, devam ediliyor.'
+                    }
+
+                    echo 'Docker build ve run işlemi...'
+                    bat "docker build -t ${IMAGE_NAME} ."
+                    bat "docker run -d -p 8090:8080 --name ${CONTAINER_NAME} ${IMAGE_NAME}"
+                    
+                    echo 'Sistemin ayağa kalkması bekleniyor (20sn)...'
+                    sleep 20
+                }
                 echo 'Sistem docker container\'lar üzerinde çalıştırıldı (5 puan)'
             }
         }
 
-        stage('E2E Tests (Selenium)') {
+        stage('6. E2E Tests (Selenium)') {
             steps {
-                // Çalışır durumdaki sisteme (localhost:8086) test senaryolarını koş
-                // DockerSystemTest sınıfını çalıştır
-                sh 'mvn test -Dtest=DockerSystemTest'
-                junit 'target/surefire-reports/*.xml'
+                bat 'mvn test -Dtest=SeleniumSystemTest'
+                
                 echo 'Çalışır durumdaki sistem üzerinden test senaryoları çalıştırıldı (55+ puan)'
             }
         }
@@ -69,9 +76,14 @@ pipeline {
 
     post {
         always {
-            // Test sonrası temizlik
-            // sh 'docker-compose down' // İsteğe bağlı, debug için açık kalabilir
             archiveArtifacts artifacts: 'target/**/*.jar', fingerprint: true
+            
+            script {
+                try {
+                    bat "docker stop ${CONTAINER_NAME}"
+                    bat "docker rm ${CONTAINER_NAME}"
+                } catch (Exception e) {}
+            }
         }
     }
 }
